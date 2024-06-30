@@ -1,0 +1,43 @@
+{% extends "webapp/layout.html" %}
+
+{% load static %}
+
+
+{% block stylesheet %}
+<link rel="stylesheet" href="{% static "css/update-record.css" %}">
+{% endblock  %}
+
+{% block content %}
+
+    <body>
+        <div class=" container bg-light shadow-md p-5 form-wrapper">
+
+            <h3> Update record </h3>
+
+            <h6> Start updating your record </h6>
+
+            <br>
+            <hr>
+            
+            <form method='POST' autocomplete='off'>
+            
+                {% csrf_token %}
+            
+                {{updaterecordform.as_p}}
+            
+                <br>
+            
+                <button type='submit' class="btn btn-info w-50 btn-block p-2">
+                     Update &nbsp;<i class="fa-solid fa-pen-to-square"></i> 
+                </button>
+
+                <a class='btn btn-secondary' href="{% url "dashboard" %}">Return &nbsp; <i class="fa-solid fa-arrow-left"></i> </a>
+
+            </form>
+
+        </div>
+    </body>
+
+
+
+{% endblock  %}

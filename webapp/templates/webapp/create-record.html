@@ -1,0 +1,55 @@
+{% extends "webapp/layout.html" %}
+
+{% load static %}
+
+{% block stylesheet %}
+<link rel="stylesheet" href="{% static "css/create-record.css" %}">
+{% endblock  %}
+
+{% block content %}
+
+<body>
+    <div  class="container ">
+    <div class=" container bg-light shadow-md p-5 form-layout">
+        <div class="d-flex justify-content-center "> 
+            <h3> Create Record </h3>
+        </div>
+        <hr>
+        
+        <form method='POST' autocomplete='off'>
+          
+            {% csrf_token %}
+            {% comment %} <label for="name">first name:</label> {% endcomment %}
+            {{createrecordform.first_name}}
+            <br>
+            {{createrecordform.last_name}}
+            <br>
+            {{createrecordform.email}}
+            <br>
+            {{createrecordform.phone}}
+            <br>
+            {{createrecordform.adress}}
+            <br>
+            {{createrecordform.province}}
+            <br>
+            {{createrecordform.city}}
+            <br>
+            {{createrecordform.country}}
+          
+            <br>
+          
+            <button type='submit' class="btn btn-primary w-50 btn-block p-2"> Create &nbsp;<i class="fa-solid fa-pen"></i> </button>
+                &nbsp; &nbsp;
+            <a class='btn btn-secondary' href="{% url "dashboard" %}">Return &nbsp; <i class="fa-solid fa-arrow-left"></i> </a>
+
+        </form>
+
+    </div>
+    </div>
+</body>
+
+
+
+
+
+{% endblock  %}

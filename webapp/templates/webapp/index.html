@@ -1,0 +1,27 @@
+{% extends "webapp/layout.html" %}
+
+
+{% block content %}
+<body>
+    <div class="text-center">
+        <br>
+        <br>
+
+        <h3> ProjextZ... Management at it's   finest! </h3>
+
+        <br>
+        <br>
+
+        <h5> keep track of your records effectively! </h5>
+        <hr> 
+        <br>
+        {% if user.is_authenticated == False %}
+        <a class = "btn btn-primary" href="{% url 'register' %}"> Create your account &nbsp;<i class="fa-solid fa-user-plus"></i> </a>
+        
+        {% endif %}
+       
+    
+    </div>
+</body>
+
+{% endblock  %}

@@ -1,0 +1,62 @@
+{% extends "webapp/layout.html" %}
+
+
+
+{% block content %}
+
+<body>
+    
+    <h3>Welcome to the dashbord!  {{user}} </h3>
+    <hr>
+    <a class='btn  btn-outline-primary btn-sm' href="{% url "create-record" %}"> Create a new record &nbsp; <i class="fa-regular fa-square-plus"></i> </a>
+    <hr>
+
+        <table class='table table-hover table-bordered'>
+            
+            <thead class='table-dark'>
+                <tr>
+                    <th scope='col'>No.</th>
+                    <th scope='col'>Fullname</th>
+                    <th scope='col'>Email</th>
+                    <th scope='col'>Phone</th>
+                    <th scope='col'>Adress</th>
+                    <th scope='col'>Province</th>
+                    <th scope='col'>City</th>
+                    <th scope='col'>country</th>
+                    <th scope='col'>Creation date</th>
+                    <th scope='col'>View</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if records %}
+                {% for record in records  %} 
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        {% comment %} <td>{{record.id}}</td> {% endcomment %}
+                        <td>{{record.first_name}} {{record.last_name}}</td>
+                        <td>{{record.email}}</td>
+                        <td>{{record.phone}}</td>
+                        <td>{{record.adress}}</td>
+                        <td>{{record.province}}</td>
+                        <td>{{record.city}}</td>
+                        <td>{{record.country}}</td>
+                        <td>{{record.creation_date}}</td>
+                        <td>
+                            <a class='btn btn-success' href="{% url "view-record" record.id %}"> <i class="fa-sharp fa-solid fa-eye"></i>  </a>
+                        
+                        </td>
+
+                    </tr>
+                
+                {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+ 
+    
+   
+    
+
+</body>
+
+{% endblock  %}
