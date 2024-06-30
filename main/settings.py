@@ -14,7 +14,7 @@ SECRET_KEY = 'django-insecure-ocp7+2#p4ltr9onoo%hfm8e!w%mya$b%i+9@7hm&&8zm-602+k
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.vercel.app']
+ALLOWED_HOSTS = ['.vercel.app','127.0.0.1']
 
 
 # Application definition
@@ -67,6 +67,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'main.wsgi.application'
+# WSGI_APPLICATION = 'vercel_app.wsgi.app'
 
 
 # Database
@@ -117,6 +118,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = os.path.join(BASE_DIR,'static_build', 'static')
 
 
 # Default primary key field type
