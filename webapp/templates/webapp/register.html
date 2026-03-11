@@ -8,44 +8,55 @@
 {% block content %}
 
 <body>
-    
+
 
     <div class=" container bg-light shadow-md p-5  form-layout ">
 
         <h3> Create you accout </h3>
-    
+
         <h5> Start managing clients today!</h5>
-    
+
         <hr>
         <br>
-    
-       
+
+
         <form method="POST" autocomplete="off" action="">
             {% csrf_token %}
-    
+
             {{form.username}}
+            {% if form.username.errors %}
+                <div class="text-danger small">{{ form.username.errors }}</div>
+            {% endif %}
             <br>
+
             {{form.password1}}
+            {% if form.password1.errors %}
+                <div class="text-danger small">{{ form.password1.errors }}</div>
+            {% endif %}
             <br>
+
             {{form.password2}}
-    
-            
+            {% if form.password2.errors %}
+                <div class="text-danger small">{{ form.password2.errors }}</div>
+            {% endif %}
+            <br>
+
             <div class="d-flex justify-content-center my-3">
                  <button type="submit" class="btn btn-primary w-30 btn-block p-2" > Create account &nbsp; <i class="fa-solid fa-user-plus"></i> </button>
-            </div>    
+            </div>
         </form>
-        
-    
+
+
         <div class='text-center'>
-            
-            <p>Alredy have an account? &nbsp; <a href="{% url "my-login" %}">Login</a></p> 
-    
+
+            <p>Alredy have an account? &nbsp; <a href="{% url "my-login" %}">Login</a></p>
+
         </div>
-    
+
     </div>
-    
+
     <br>
-        
+
 </body>
 
 {% endblock  %}
