@@ -1,0 +1,36 @@
+{% if records %}
+
+  <div class="results-meta">
+    <span class="results-count">
+      <span>{{ records|length }}</span> record{{ records|length|pluralize }} found
+    </span>
+  </div>
+
+  <div class="record-list">
+    {% for record in records %}
+    <a href="{% url 'record_detail' record.pk %}" class="record-card" style="animation-delay: {{ forloop.counter0 }}00ms">
+      <div class="record-icon">
+        <i class="fa-solid fa-file-lines"></i>
+      </div>
+      <div class="record-body">
+        <div class="record-title">{{ record.name }}</div>
+        <div class="record-meta">
+          <span><i class="fa-regular fa-calendar"></i>{{ record.created_at|date:"d M Y" }}</span>
+          <span><i class="fa-solid fa-tag"></i>{{ record.category }}</span>
+          <span><i class="fa-solid fa-hashtag"></i>{{ record.reference_number }}</span>
+        </div>
+      </div>
+      <span class="record-badge badge-{{ record.status }}">{{ record.status }}</span>
+    </a>
+    {% endfor %}
+  </div>
+
+{% else %}
+
+  <div class="empty-state">
+    <div class="empty-icon"><i class="fa-solid fa-file-circle-xmark"></i></div>
+    <h3>No records found</h3>
+    <p>Try a different search term or adjust the filter above.</p>
+  </div>
+
+{% endif %}

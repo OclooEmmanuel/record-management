@@ -1,10 +1,13 @@
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from .models import Records
+from .serializers import RecordsSerializer
+
 
 # Register
 @api_view(['POST'])
@@ -22,7 +25,7 @@ def api_register(request):
         error = {'error': 'username is already taken.'}
         return Response(error, status=status.HTTP_400_BAD_REQUEST)
 
-    user = User.objects.create(
+    user = User.objects.create_user(
         username=username,
         password=password,
         email=email,
@@ -59,6 +62,7 @@ def api_login(request):
     error = {'error':'invalid credentials'}
     return Response(error, status=status.HTTP_401_UNAUTHORIZED)
 
+
 # Logout (blacklist refresh token)
 @api_view(['POST'])
 def api_logout(request):
@@ -72,4 +76,68 @@ def api_logout(request):
         error = {'error' : 'invalid token'}
         return Response(error, status=status.HTTP_400_BAD_REQUEST)
 
+
+# CRUD API
+# ---get all endpoint
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def  api_get_records(request):
+    records = Records.objects.all()
+    serializer = RecordsSerializer(records, many = True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# --get single endpoint
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def api_get_record(request, pk):
+    try:
+        record = Records.objects.get(id=pk)
+    except Records.DoesNotExist:
+        error = {'error' : 'Record not found.'}
+        return Response(error, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = RecordsSerializer(record)
+    return Response(serializer.data)
+
+
+# --create endpoint
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def api_create_record(request):
+    serializer = RecordsSerializer(dtata=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# ---edit record endpoint
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def api_update_record(request, pk):
+    try:
+        record = Records.objects.get(id=pk)
+    except Records.DoesNotExist:
+        error ={'error' : 'Record not found.'}
+        return Response(error, status=status.HTTP_404_NOT_FOUND)
+    serializer = RecordsSerializer(record, data=request.data)
+    if  serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# -- Delete endpoint
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def api_delete_record(request, pk):
+    try:
+        record = Records.objects.get(id=pk)
+    except Records.DoesNotExist:
+        error ={'error' : 'Record not found.'}
+        return Response(error, status=status.HTTP_404_NOT_FOUND)
+    record.delete()
+    message = {'message' : 'Record deleted successfully'}
+    return Response(message, status=status.HTTP_200_OK)
 

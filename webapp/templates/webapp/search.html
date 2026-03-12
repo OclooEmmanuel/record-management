@@ -1,0 +1,407 @@
+{% extends "webapp/layout.html" %}
+
+{% block stylesheet %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --ink:     #0f0e0c;
+    --parchment: #f7f3ec;
+    --warm-white: #fdfaf5;
+    --gold:    #b5873a;
+    --gold-dim: rgba(181,135,58,0.18);
+    --muted:   #7a7060;
+    --rule:    rgba(181,135,58,0.25);
+    --card-bg: #ffffff;
+    --shadow:  0 2px 24px rgba(15,14,12,0.07);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--parchment);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ── PAGE HEADER ── */
+  .search-header {
+    background: var(--ink);
+    padding: 3.5rem 0 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .search-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(181,135,58,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(181,135,58,0.06) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .search-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .header-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    text-align: center;
+  }
+
+  .header-eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .header-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 300;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 0.3em;
+  }
+
+  .header-title strong {
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  .header-sub {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.45);
+    font-weight: 300;
+    letter-spacing: 0.03em;
+    margin-bottom: 2.2rem;
+  }
+
+  /* ── SEARCH BOX ── */
+  .search-wrap {
+    position: relative;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 1.05rem 3.5rem 1.05rem 1.4rem;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(181,135,58,0.35);
+    border-radius: 3px;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+    outline: none;
+    transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
+    caret-color: var(--gold);
+  }
+
+  .search-input::placeholder { color: rgba(255,255,255,0.3); }
+
+  .search-input:focus {
+    border-color: var(--gold);
+    background: rgba(255,255,255,0.1);
+    box-shadow: 0 0 0 3px rgba(181,135,58,0.12);
+  }
+
+  .search-icon {
+    position: absolute;
+    right: 1.1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gold);
+    font-size: 0.9rem;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  /* HTMX loading indicator */
+  .htmx-indicator {
+    display: none;
+    position: absolute;
+    right: 1.1rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .htmx-request .htmx-indicator { display: block; }
+  .htmx-request .search-icon     { display: none; }
+
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(181,135,58,0.3);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Filter chips */
+  .filter-chips {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 1.2rem;
+  }
+
+  .chip {
+    padding: 0.3rem 1rem;
+    border: 1px solid rgba(181,135,58,0.25);
+    border-radius: 30px;
+    background: transparent;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .chip:hover, .chip.active {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: var(--gold-dim);
+  }
+
+  /* ── RESULTS AREA ── */
+  .results-area {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  .results-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .results-count {
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .results-count span { color: var(--gold); font-weight: 500; }
+
+  /* ── RECORD CARDS ── */
+  .record-list { display: flex; flex-direction: column; gap: 0.75rem; }
+
+  .record-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(15,14,12,0.08);
+    border-radius: 4px;
+    padding: 1.4rem 1.6rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    box-shadow: var(--shadow);
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    color: inherit;
+    animation: slideIn 0.3s ease both;
+  }
+
+  .record-card:hover {
+    border-color: var(--gold);
+    transform: translateX(4px);
+    box-shadow: 0 4px 32px rgba(15,14,12,0.1);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .record-icon {
+    width: 40px; height: 40px;
+    border-radius: 3px;
+    background: var(--gold-dim);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--gold);
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .record-body { flex: 1; min-width: 0; }
+
+  .record-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .record-meta {
+    font-size: 0.78rem;
+    color: var(--muted);
+    display: flex;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+  }
+
+  .record-meta i { font-size: 0.7rem; margin-right: 0.3rem; }
+
+  .record-badge {
+    margin-left: auto;
+    padding: 0.25rem 0.8rem;
+    border-radius: 2px;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 500;
+    white-space: nowrap;
+    align-self: flex-start;
+    flex-shrink: 0;
+  }
+
+  .badge-active   { background: rgba(52,168,83,0.1);  color: #2d8a46; border: 1px solid rgba(52,168,83,0.2); }
+  .badge-pending  { background: rgba(181,135,58,0.12); color: var(--gold); border: 1px solid var(--rule); }
+  .badge-archived { background: rgba(120,113,108,0.1); color: var(--muted); border: 1px solid rgba(120,113,108,0.2); }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    animation: slideIn 0.3s ease;
+  }
+
+  .empty-icon {
+    width: 64px; height: 64px;
+    border: 1px solid var(--rule);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: var(--gold);
+    font-size: 1.4rem;
+  }
+
+  .empty-state h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 0.4rem;
+  }
+
+  .empty-state p { font-size: 0.85rem; color: var(--muted); }
+
+  /* ── INITIAL PROMPT ── */
+  .search-prompt {
+    text-align: center;
+    padding: 3.5rem 2rem;
+  }
+
+  .prompt-line {
+    width: 1px; height: 40px;
+    background: var(--rule);
+    margin: 0 auto 1.5rem;
+  }
+
+  .search-prompt p {
+    font-size: 0.82rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- PAGE HEADER + SEARCH -->
+<div class="search-header">
+  <div class="header-inner">
+    <span class="header-eyebrow">ProjextZ Records</span>
+    <h1 class="header-title">Search the <strong>Archive</strong></h1>
+    <p class="header-sub">Locate any record instantly across the entire system</p>
+
+    <!-- HTMX Search Input -->
+    <div class="search-wrap">
+      <input
+        type="search"
+        id="search-input"
+        name="q"
+        class="search-input"
+        placeholder="Search by name, ID, category…"
+        autocomplete="off"
+        hx-get="{% url 'records_search_partial' %}"
+        hx-trigger="keyup changed delay:350ms, search"
+        hx-target="#search-results"
+        hx-swap="innerHTML"
+        hx-indicator="#search-wrap-indicator"
+      >
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <div class="htmx-indicator" id="search-wrap-indicator">
+        <div class="spinner"></div>
+      </div>
+    </div>
+
+    <!-- Filter chips — pass as extra param -->
+    <div class="filter-chips" id="filter-chips">
+      <button class="chip active" onclick="setFilter(this, '')"          >All</button>
+      <button class="chip"        onclick="setFilter(this, 'active')"    >Active</button>
+      <button class="chip"        onclick="setFilter(this, 'pending')"   >Pending</button>
+      <button class="chip"        onclick="setFilter(this, 'archived')"  >Archived</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="results-area">
+  <div id="search-results">
+    <!-- Initial prompt -->
+    <div class="search-prompt">
+      <div class="prompt-line"></div>
+      <p>Start typing to search records&hellip;</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Filter chip adds &status= param to the HTMX request
+  function setFilter(el, status) {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+
+    const input = document.getElementById('search-input');
+    // Add status as an extra value HTMX sends
+    input.setAttribute('hx-vals', JSON.stringify({ status }));
+    // Trigger a fresh search
+    htmx.trigger(input, 'keyup');
+  }
+</script>
+
+{% endblock %}

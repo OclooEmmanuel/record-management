@@ -127,7 +127,22 @@ def delete_record(request,pk):
 
 
 
+def search_page(request):
+    return render(request, "webapp/search.html")
 
+def records_search_partial(request):
+    q      = request.GET.get("q", "").strip()
+    status = request.GET.get("status", "").strip()
+
+    records = Records.objects.all()
+
+    if q:
+        records = records.filter(name__icontains=q)  # add more fields as needed
+
+    if status:
+        records = records.filter(status=status)
+
+    return render(request, "webapp/_search_results.html", {"records": records})
 
 
 
