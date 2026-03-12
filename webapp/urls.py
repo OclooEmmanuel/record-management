@@ -18,7 +18,7 @@ urlpatterns = [
     path('delete-record/<int:pk>', views.delete_record, name='delete-record'),
 
 
-    # ---API(S)
+    # ---API
     # AUTH
     path('api/register', api_register, name='api-register'),
     path('api/login', api_login, name='api-register'),
