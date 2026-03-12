@@ -5,14 +5,14 @@
 {% block content %}
 
 <body>
-    
-    <h3>Welcome to the dashbord!  {{user}} </h3>
+
+    <h3 style=color:white;>Welcome to the dashbord!  {{user}} </h3>
     <hr>
-    <a class='btn  btn-outline-primary btn-sm' href="{% url "create-record" %}"> Create a new record &nbsp; <i class="fa-regular fa-square-plus"></i> </a>
+    <a class='btn  btn-primary btn-sm' href="{% url "create-record" %}"> Create a new record &nbsp; <i class="fa-regular fa-square-plus"></i> </a>
     <hr>
 
         <table class='table table-hover table-bordered'>
-            
+
             <thead class='table-dark'>
                 <tr>
                     <th scope='col'>No.</th>
@@ -29,7 +29,7 @@
             </thead>
             <tbody>
                 {% if records %}
-                {% for record in records  %} 
+                {% for record in records  %}
                     <tr>
                         <td>{{ forloop.counter }}</td>
                         {% comment %} <td>{{record.id}}</td> {% endcomment %}
@@ -43,19 +43,19 @@
                         <td>{{record.creation_date}}</td>
                         <td>
                             <a class='btn btn-success' href="{% url "view-record" record.id %}"> <i class="fa-sharp fa-solid fa-eye"></i>  </a>
-                        
+
                         </td>
 
                     </tr>
-                
+
                 {% endfor %}
                 {% endif %}
             </tbody>
         </table>
- 
-    
-   
-    
+
+
+
+
 
 </body>
 
