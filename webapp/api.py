@@ -105,7 +105,7 @@ def api_get_record(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def api_create_record(request):
-    serializer = RecordsSerializer(dtata=request.data)
+    serializer = RecordsSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
